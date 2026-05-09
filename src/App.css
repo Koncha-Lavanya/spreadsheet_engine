@@ -1,0 +1,556 @@
+/* App.css — GridForge: Dark Industrial Spreadsheet UI */
+
+:root {
+  --bg-deep:        #0a0c0f;
+  --bg-panel:       #10131a;
+  --bg-surface:     #161b24;
+  --bg-cell:        #12161e;
+  --bg-cell-hover:  #1a2030;
+  --bg-header:      #0d1018;
+  --bg-selected:    #1a2f4a;
+  --bg-formula:     #0f1520;
+
+  --border:         #1e2535;
+  --border-light:   #2a3345;
+  --border-accent:  #2e5eff;
+
+  --text-primary:   #e2e8f0;
+  --text-secondary: #7a8aaa;
+  --text-muted:     #4a5568;
+  --text-header:    #5a7090;
+
+  --accent:         #2e5eff;
+  --accent-dim:     #1a3a99;
+  --accent-glow:    rgba(46, 94, 255, 0.15);
+
+  --green:          #00d084;
+  --red:            #ff4d6a;
+  --orange:         #ff8c42;
+  --yellow:         #ffd166;
+
+  --cell-width:     88px;
+  --cell-height:    32px;
+  --row-header-w:   42px;
+
+  --font-mono:      'JetBrains Mono', 'Courier New', monospace;
+  --font-ui:        'Syne', sans-serif;
+
+  --radius:         4px;
+  --toolbar-h:      52px;
+  --formulabar-h:   44px;
+  --statusbar-h:    30px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+/* ─── Background texture ─── */
+.app-bg {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(46,94,255,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at 80% 80%, rgba(0,208,132,0.04) 0%, transparent 60%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 31px,
+      rgba(255,255,255,0.015) 31px,
+      rgba(255,255,255,0.015) 32px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 87px,
+      rgba(255,255,255,0.015) 87px,
+      rgba(255,255,255,0.015) 88px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* ─── Toolbar ─── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: var(--toolbar-h);
+  padding: 0 16px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.4);
+}
+
+.toolbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 8px;
+}
+
+.brand-icon {
+  font-size: 22px;
+  color: var(--accent);
+  line-height: 1;
+  filter: drop-shadow(0 0 8px var(--accent));
+}
+
+.brand-name {
+  font-family: var(--font-ui);
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--text-primary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.brand-tag {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 2px 6px;
+  border: 1px solid var(--border-light);
+  border-radius: 2px;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.15s ease;
+  letter-spacing: 0.02em;
+}
+
+.toolbar-btn:hover:not(.disabled) {
+  background: var(--bg-cell-hover);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.toolbar-btn.disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.toolbar-btn-danger:hover:not(.disabled) {
+  border-color: var(--red);
+  color: var(--red);
+  box-shadow: 0 0 12px rgba(255, 77, 106, 0.15);
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+.toolbar-hints {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+kbd {
+  display: inline-block;
+  padding: 1px 5px;
+  background: var(--bg-header);
+  border: 1px solid var(--border-light);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* ─── Formula Bar ─── */
+.formula-bar {
+  display: flex;
+  align-items: center;
+  height: var(--formulabar-h);
+  background: var(--bg-formula);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.formula-cell-label {
+  width: 56px;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--accent);
+  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+  padding: 0 8px;
+  letter-spacing: 0.06em;
+  line-height: var(--formulabar-h);
+}
+
+.formula-fx {
+  width: 36px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--green);
+  font-style: italic;
+  font-weight: 600;
+  border-right: 1px solid var(--border);
+  flex-shrink: 0;
+  line-height: var(--formulabar-h);
+}
+
+.formula-input {
+  flex: 1;
+  padding: 0 14px;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-primary);
+  height: 100%;
+  letter-spacing: 0.02em;
+}
+
+.formula-input::placeholder {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.formula-input:focus {
+  background: rgba(46, 94, 255, 0.04);
+}
+
+/* ─── Main ─── */
+.app-main {
+  flex: 1;
+  overflow: auto;
+  background: var(--bg-deep);
+  position: relative;
+}
+
+/* ─── Grid ─── */
+.grid-wrapper {
+  display: inline-block;
+  min-width: 100%;
+  min-height: 100%;
+  padding: 16px;
+}
+
+.spreadsheet-table {
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+/* Corner + Headers */
+.corner-header {
+  width: var(--row-header-w);
+  height: var(--cell-height);
+  background: var(--bg-header);
+  border-right: 2px solid var(--border);
+  border-bottom: 2px solid var(--border);
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 10;
+}
+
+.col-header {
+  width: var(--cell-width);
+  height: var(--cell-height);
+  background: var(--bg-header);
+  border-right: 1px solid var(--border);
+  border-bottom: 2px solid var(--border);
+  text-align: center;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--text-header);
+  text-transform: uppercase;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  user-select: none;
+  transition: background 0.1s, color 0.1s;
+}
+
+.col-header.header-active {
+  background: var(--bg-selected);
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.row-header {
+  width: var(--row-header-w);
+  height: var(--cell-height);
+  background: var(--bg-header);
+  border-right: 2px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  text-align: center;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 11px;
+  color: var(--text-header);
+  user-select: none;
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  transition: background 0.1s, color 0.1s;
+}
+
+.row-header.header-active {
+  background: var(--bg-selected);
+  color: var(--accent);
+  border-right-color: var(--accent);
+}
+
+/* ─── Cells ─── */
+.cell {
+  width: var(--cell-width);
+  height: var(--cell-height);
+  background: var(--bg-cell);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 0 6px;
+  position: relative;
+  cursor: cell;
+  transition: background 0.1s;
+  outline: none;
+  overflow: hidden;
+}
+
+.cell:hover:not(.cell-selected) {
+  background: var(--bg-cell-hover);
+}
+
+.cell-selected {
+  background: var(--bg-selected) !important;
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  z-index: 2;
+}
+
+.cell-display {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  line-height: var(--cell-height);
+  color: var(--text-primary);
+  text-align: right;
+  user-select: none;
+}
+
+/* Number-like values right aligned, text left aligned */
+.cell-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0 6px;
+  background: #1e2d50;
+  border: none;
+  outline: 2px solid var(--accent);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--yellow);
+  z-index: 10;
+  letter-spacing: 0.02em;
+}
+
+/* Alignment */
+.align-right  { text-align: right; }
+.align-left   { text-align: left; }
+.align-center { text-align: center; }
+
+/* Error states */
+.cell-error .cell-display {
+  color: var(--red);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+}
+.cell-error {
+  background: rgba(255, 77, 106, 0.06) !important;
+}
+
+.cell-circular .cell-display {
+  color: var(--orange);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.cell-circular {
+  background: rgba(255, 140, 66, 0.06) !important;
+}
+
+/* Boolean TRUE / FALSE */
+.cell-bool-true .cell-display {
+  color: var(--green);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+.cell-bool-true {
+  background: rgba(0, 208, 132, 0.05) !important;
+}
+
+.cell-bool-false .cell-display {
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+.cell-bool-false {
+  background: rgba(122, 138, 170, 0.04) !important;
+}
+
+/* ─── Status Bar ─── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--statusbar-h);
+  padding: 0 14px;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.status-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.status-dot.red   { background: var(--red);   box-shadow: 0 0 6px var(--red); }
+
+.error-badge {
+  padding: 1px 5px;
+  background: rgba(255, 77, 106, 0.12);
+  border: 1px solid rgba(255, 77, 106, 0.25);
+  border-radius: 3px;
+  color: var(--red);
+  font-size: 10px;
+  font-weight: 600;
+  margin-right: 3px;
+}
+
+.status-right {
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+/* ─── Scrollbar ─── */
+.app-main::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.app-main::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+.app-main::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-radius: 4px;
+}
+.app-main::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-dim);
+}
+.app-main::-webkit-scrollbar-corner {
+  background: var(--bg-deep);
+}
+
+/* ─── Selection glow on row ─── */
+tr:has(.cell-selected) .row-header {
+  background: var(--bg-selected);
+  color: var(--accent);
+  border-right-color: var(--accent);
+}
+
+/* ─── Animations ─── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.app {
+  animation: fadeIn 0.3s ease;
+}
+
+/* Formula-bearing cells get a subtle indicator */
+.cell:has(.cell-display[data-formula="true"])::before {
+  content: '';
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+  opacity: 0.5;
+}
